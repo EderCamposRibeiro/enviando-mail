@@ -2,9 +2,14 @@ package enviando.mail;
 
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
@@ -38,7 +43,17 @@ public class AppTest {
 				}
 			});
 			
-			System.out.println(session);
+			/*Podemos mandar para um ou para vários (essa classe aceita Array)*/
+			Address[] toUser = InternetAddress.parse("edercribeiro@gmail.com, tasmazzoccante@gmail.com, ederjavateste@gmail.com");
+			
+			/*Menssagem a ser enviada*/
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(userName));
+			message.setRecipients(Message.RecipientType.TO, toUser);/*Email de destino*/
+			message.setSubject("Chegou o e-mail enviado com java");/*Assunto do e-mail*/
+			message.setText("Que Maravilha!!! Você acaba de receber um E-mail enviado com JavaMail!!!!!!!!!! Parabéns!!!!!");
+			
+			Transport.send(message);
 			
 		} catch (Exception e) {
 
