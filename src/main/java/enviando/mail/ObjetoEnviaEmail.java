@@ -3,6 +3,8 @@ package enviando.mail;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -139,6 +141,77 @@ public class ObjetoEnviaEmail {
 		Transport.send(message);
 
 	}	
+
+	public void enviarEmailAnexoLista(boolean envioHtml) throws Exception{
+		/* Olhe as configurações smtp do seu email */
+
+		/* Propriedades SMTP para configuração específica do Gmail */
+		Properties properties = new Properties();
+		properties.put("mail.smtp.ssl.trust", "*");/* Autenticação SSL */
+		properties.put("mail.smtp.auth", "true");/* Autorização */
+		properties.put("mail.smtp.starttls", "true");/* Autenticação */
+		properties.put("mail.smtp.host", "smtp.gmail.com");/* Servidor gmail Google */
+		properties.put("mail.smtp.port", "465");/* Porta do servidor */
+		properties.put("mail.smtp.socketFactory.port",
+				"465");/* Especifica a Porta do servidor a ser conectada pelo socket */
+		properties.put("mail.smtp.socketFactory.class",
+				"javax.net.ssl.SSLSocketFactory");/* Classe socket de conexão ao SMTP */
+
+		Session session = Session.getInstance(properties, new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(userName, senha);
+			}
+		});
+
+		/* Podemos mandar para um ou para vários (essa classe aceita Array) */
+		Address[] toUser = InternetAddress.parse(listaDestinatarios);
+
+		/* Menssagem a ser enviada */
+		Message message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(userName, nomeRemetente)); /*userName, "Eder JDev - Treinamento"*/
+		message.setRecipients(Message.RecipientType.TO, toUser);/* Email de destino */
+		message.setSubject(assuntoEmail);/* Assunto do e-mail */
+		
+		/*Parte 1 do e-mail que é o texto e a descrição do e-mail*/
+		MimeBodyPart corpoEmail = new MimeBodyPart();
+		
+		if (envioHtml) {
+			corpoEmail.setContent(textoEmail, "text/html; charset=utf-8" );
+		} else {
+			corpoEmail.setText(textoEmail);
+		}
+		
+		List<FileInputStream> arquivos = new ArrayList<FileInputStream>();
+		arquivos.add(simuladorDePDF());/*Certificado*/
+		arquivos.add(simuladorDePDF());/*Nota Fiscal*/
+		arquivos.add(simuladorDePDF());/*documento de texto*/
+		arquivos.add(simuladorDePDF());/*Imagem*/
+		
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(corpoEmail);
+		
+		int index = 1;
+		for (FileInputStream fileInputStream : arquivos) {
+			
+			/*Parte 2 do e-mail que são os anexos em pdf*/
+			MimeBodyPart anexoEmail = new MimeBodyPart();
+		
+			/*Onde é passado o simuladorDePDF você passa o seu arquivo gravado no banco de dados*/
+			anexoEmail.setDataHandler(new DataHandler(new ByteArrayDataSource(fileInputStream, "application/pdf")));
+			anexoEmail.setFileName("anexoemail"+index+".pdf");
+			
+			multipart.addBodyPart(anexoEmail);
+			
+			index++;
+		}
+		
+		message.setContent(multipart);
+		
+		Transport.send(message);
+
+	}	
+
 	
 	/*
 	 * Esse método simula o PDF ou qualquer arquivo que possa ser enviado por anexo no e-mail.
