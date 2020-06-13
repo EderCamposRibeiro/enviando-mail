@@ -29,6 +29,7 @@ public class AppTest {
 		try {
 			/*Propriedades SMTP para configuração específica do Gmail*/
 			Properties properties = new Properties();
+			properties.put("mail.smtp.ssl.trust", "*");/*Autenticação SSL*/
 			properties.put("mail.smtp.auth", "true");/*Autorização*/
 			properties.put("mail.smtp.starttls", "true");/*Autenticação*/
 			properties.put("mail.smtp.host", "smtp.gmail.com");/*Servidor gmail Google*/
@@ -44,16 +45,21 @@ public class AppTest {
 			});
 			
 			/*Podemos mandar para um ou para vários (essa classe aceita Array)*/
-			Address[] toUser = InternetAddress.parse("edercribeiro@gmail.com, tasmazzoccante@gmail.com, ederjavateste@gmail.com");
+			Address[] toUser = InternetAddress.parse("edercribeiro@gmail.com, ederjavateste@gmail.com");
 			
 			/*Menssagem a ser enviada*/
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(userName));
+			message.setFrom(new InternetAddress(userName, "Eder JDev - Treinamento"));
 			message.setRecipients(Message.RecipientType.TO, toUser);/*Email de destino*/
 			message.setSubject("Chegou o e-mail enviado com java");/*Assunto do e-mail*/
 			message.setText("Que Maravilha!!! Você acaba de receber um E-mail enviado com JavaMail!!!!!!!!!! Parabéns!!!!!");
 			
 			Transport.send(message);
+			
+			/*Caso o e-mail não esteja sendo enviado então 
+			 *coloque um tempo de espera, mais isso só pode
+			 *ser usado para testes.*/
+			//Thread.sleep(10000);
 			
 		} catch (Exception e) {
 
