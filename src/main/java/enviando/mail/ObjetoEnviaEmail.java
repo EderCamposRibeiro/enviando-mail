@@ -28,7 +28,7 @@ public class ObjetoEnviaEmail {
 		this.textoEmail = textoEmail;
 	}
 	
-	public void enviarEmail() throws Exception{
+	public void enviarEmail(boolean envioHtml) throws Exception{
 		/* Olhe as configurações smtp do seu email */
 
 		/* Propriedades SMTP para configuração específica do Gmail */
@@ -58,7 +58,14 @@ public class ObjetoEnviaEmail {
 		message.setFrom(new InternetAddress(userName, nomeRemetente)); /*userName, "Eder JDev - Treinamento"*/
 		message.setRecipients(Message.RecipientType.TO, toUser);/* Email de destino */
 		message.setSubject(assuntoEmail);/* Assunto do e-mail */
-		message.setText(textoEmail);
+		
+		if (envioHtml) {
+			message.setContent(textoEmail, "text/html; charset=utf-8" );
+		} else {
+			message.setText(textoEmail);
+		}
+		
+		
 
 		Transport.send(message);
 

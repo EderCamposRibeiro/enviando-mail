@@ -18,7 +18,7 @@ public class AppTest {
 						             "Testando e-mail com Java",
 						             "Esse texto é a descrição do meu e-mail");
 		
-		enviaEmail.enviarEmail();
+		enviaEmail.enviarEmail(false);
 					
 			/*Caso o e-mail não esteja sendo enviado então 
 			 *coloque um tempo de espera, mais isso só pode
